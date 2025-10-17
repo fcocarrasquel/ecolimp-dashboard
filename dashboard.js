@@ -234,8 +234,51 @@ async function loadMessages() {
     table.appendChild(row);
   });
 
-  updateNotificationBadge();
+  async function updateNotificationBadge() {
+  try {
+    if (!currentUser || currentUser.email === ADMIN_EMAIL) return; // Solo usuarios normales
+
+    // Buscar el usuario actual
+    const { data: userData, error: userError } = await client
+      .from("users")
+      .select("id")
+      .eq("email", currentUser.email)
+      .single();
+
+    if (userError) {
+      console.error("Error obteniendo usuario:", userError);
+      return;
+    }
+    if (!userData) return;
+
+    // Contar mensajes pendientes
+    const { count, error } = await client
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userData.id)
+      .eq("status", "pending");
+
+    if (error) {
+      console.error("Error contando mensajes:", error);
+      return;
+    }
+
+    // Actualizar badge visual
+    const badge = document.getElementById("notifBadge");
+    if (!badge) return;
+
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+
+  } catch (err) {
+    console.error("Error general en updateNotificationBadge:", err);
+  }
 }
+
 
 // === ACTUALIZAR CONTADOR DE NOTIFICACIONES ===
 async function updateNotificationBadge() {
