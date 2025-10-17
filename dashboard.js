@@ -40,7 +40,7 @@ loginBtn.addEventListener("click", async () => {
   const password = document.getElementById("password").value;
 
   const { data, error } = await client.auth.signInWithPassword({ email, password });
-  if (error) return alert("❌ Credenciales incorrectas");
+  if (error) return showToast("❌ Credenciales incorrectas", "error");
 
   loginSection.classList.add("hidden");
   dashboardSection.classList.remove("hidden");
@@ -59,7 +59,7 @@ logoutBtn.addEventListener("click", async () => {
 // === CARGAR USUARIOS ===
 async function loadUsers() {
   const { data: users, error } = await client.from("users").select("*");
-  if (error) return alert("Error cargando usuarios");
+  if (error) return showToast("Error cargando usuarios", "error");
 
   document.getElementById("totalUsers").textContent = users.length;
   const totalBalance = users.reduce((acc, u) => acc + (u.total_balance || 0), 0);
@@ -89,8 +89,8 @@ async function loadUsers() {
 // === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
   const { error } = await client.rpc("add_referral_bonus", { user_id: userId });
-  if (error) return alert("Error al confirmar referido");
-  alert("✅ Referido confirmado");
+  if (error) return showToast("Error al confirmar referido" , "error");
+  showToast("✅ Referido confirmado" , "error");
   loadUsers();
 }
 
@@ -100,7 +100,7 @@ async function loadMessages() {
     .from("messages")
     .select("*, users(name)")
     .order("sent_at", { ascending: false });
-  if (error) return alert("Error cargando mensajes");
+  if (error) return showToast("Error cargando mensajes" , "error");
 
   const table = document.getElementById("messagesTable");
   table.innerHTML = "";
@@ -149,11 +149,11 @@ function closeMessageModal() {
 }
 document.getElementById("sendMsgBtn").addEventListener("click", async () => {
   const message = document.getElementById("messageContent").value.trim();
-  if (!message) return alert("Mensaje vacío");
+  if (!message) return showToast("Mensaje vacío" , "error");
 
   const { error } = await client.from("messages").insert([{ user_id: selectedUserId, message }]);
-  if (error) return alert("Error al guardar mensaje");
-  alert("✅ Mensaje guardado correctamente");
+  if (error) return showToast("Error al guardar mensaje", "error");
+  showToast("✅ Mensaje guardado correctamente", "error");
   closeMessageModal();
   loadMessages();
 });
