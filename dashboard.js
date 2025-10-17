@@ -1,7 +1,7 @@
 // 🚀 Configura tu Supabase
-const SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
-const SUPABASE_KEY = "TU_API_KEY";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = "https://gqjyuhcrzevxkschomje.supabase.co";
+const SUPABASE_KEY = "TU_API_KEY"; // ⚠️ Usa tu anon key pública
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elementos del DOM
 const loginSection = document.getElementById("loginSection");
@@ -22,7 +22,7 @@ loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
   if (error) return alert("❌ Credenciales incorrectas");
 
   loginSection.classList.add("hidden");
@@ -33,7 +33,7 @@ loginBtn.addEventListener("click", async () => {
 
 // === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
-  await supabase.auth.signOut();
+  await client.auth.signOut();
   loginSection.classList.remove("hidden");
   dashboardSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
@@ -41,7 +41,7 @@ logoutBtn.addEventListener("click", async () => {
 
 // === CARGAR USUARIOS ===
 async function loadUsers() {
-  const { data: users, error } = await supabase.from("users").select("*");
+  const { data: users, error } = await client.from("users").select("*");
   if (error) return alert("Error cargando usuarios");
 
   document.getElementById("totalUsers").textContent = users.length;
@@ -71,7 +71,7 @@ async function loadUsers() {
 
 // === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
-  const { error } = await supabase.rpc("add_referral_bonus", { user_id: userId });
+  const { error } = await client.rpc("add_referral_bonus", { user_id: userId });
   if (error) return alert("Error al confirmar referido");
   alert("✅ Referido confirmado");
   loadUsers();
@@ -79,7 +79,7 @@ async function confirmReferral(userId) {
 
 // === CARGAR MENSAJES ===
 async function loadMessages() {
-  const { data: messages, error } = await supabase
+  const { data: messages, error } = await client
     .from("messages")
     .select("*, users(name)")
     .order("sent_at", { ascending: false });
@@ -134,11 +134,12 @@ document.getElementById("sendMsgBtn").addEventListener("click", async () => {
   const message = document.getElementById("messageContent").value.trim();
   if (!message) return alert("Mensaje vacío");
 
-  const { error } = await supabase.from("messages").insert([{ user_id: selectedUserId, message }]);
+  const { error } = await client.from("messages").insert([{ user_id: selectedUserId, message }]);
   if (error) return alert("Error al guardar mensaje");
   alert("✅ Mensaje guardado correctamente");
   closeMessageModal();
   loadMessages();
 });
+
 
 
