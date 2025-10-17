@@ -15,107 +15,136 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-  <!-- ✅ Estilos globales -->
-  <style>
-    /* Tipografía y fondo general */
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
+ <!-- ✅ Estilos globales -->
+<style>
+  /* Tipografía y fondo general */
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
 
-    /* Colores institucionales */
-    .primary-bg { background-color: #ff6600; }
-    .primary-text { color: #ff6600; }
-    .dark-bg { background-color: #111; }
+  /* Colores institucionales */
+  .primary-bg { background-color: #ff6600; }
+  .primary-text { color: #ff6600; }
+  .dark-bg {
+    background-color: #111;
+    position: relative;      /* ✅ Necesario para z-index del header */
+    z-index: 40;
+  }
 
-    /* 🔔 Campana de notificación */
-    #notifBell {
-      transition: transform 0.2s ease-in-out;
-      cursor: pointer;
-    }
-    #notifBell:hover {
-      transform: scale(1.15);
-    }
+  /* 🔔 Campana de notificación */
+  #notifBell {
+    position: relative;      /* ✅ Para que los elementos hijos se posicionen correctamente */
+    z-index: 60;             /* ✅ Asegura que esté sobre el fondo oscuro */
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    /* 🔴 Contador */
-    #notifCount {
-      min-width: 18px;
-      text-align: center;
-      animation: bounce 1s infinite alternate;
-    }
+  #notifBell:hover {
+    transform: scale(1.15);
+  }
 
-    /* 🩷 Animación rebote */
-    @keyframes bounce {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-2px); }
-      100% { transform: translateY(0); }
-    }
+  /* 🔴 Contador */
+  #notifCount {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    min-width: 18px;
+    text-align: center;
+    background: #e11d48;
+    color: #fff;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 5px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    animation: bounce 1s infinite alternate;
+    z-index: 70;             /* ✅ Siempre encima del SVG */
+  }
 
-    /* 🔝 Tooltip sobre todo */
-    .tooltip {
-      position: absolute;
-      background: #000;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      z-index: 50;
-    }
+  /* 🩷 Animación rebote */
+  @keyframes bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+  }
 
-    .group:hover .tooltip {
-      opacity: 1;
-    }
-  </style>
+  /* 💬 Tooltip */
+  .tooltip {
+    position: absolute;
+    background: #000;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 80;             /* ✅ Sobre todo lo demás */
+    top: 28px;
+    white-space: nowrap;
+  }
+
+  .group:hover .tooltip {
+    opacity: 1;
+  }
+
+  /* ✨ SVG glow sutil sobre fondo oscuro */
+  #notifBell svg {
+    filter: drop-shadow(0 0 2px orange);
+  }
+</style>
+
 </head>
 
 
 <body class="text-gray-900">
   <!-- HEADER -->
-  <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md relative z-20">
+  <header class="dark-bg text-white px-6 py-3 flex justify-between items-center shadow-md relative z-50">
   <!-- LOGO -->
   <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
     🧼 Ecolimp Dashboard
   </h1>
 
-  <!-- SECCIÓN DERECHA: campana + logout -->
-  <div class="flex items-center gap-4 relative">
+  <!-- SECCIÓN DERECHA -->
+  <div class="flex items-center gap-6 relative z-50">
     <!-- 🔔 Notificaciones -->
-    <div
-      id="notifBell"
-      class="relative hidden cursor-pointer group"
-      title="Mensajes nuevos"
-      style="z-index: 30;"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke-width="2" stroke="orange"
-           class="w-7 h-7 animate-pulse relative z-30">
-        <path stroke-linecap="round" stroke-linejoin="round"
+    <div id="notifBell"
+         class="relative flex items-center justify-center cursor-pointer group"
+         title="Mensajes nuevos"
+         style="display:none; z-index:60;">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke-width="2"
+           stroke="orange"
+           class="w-7 h-7 animate-pulse drop-shadow-lg">
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.937M13 21a2 2 0 01-4 0" />
       </svg>
-
-      <!-- Contador -->
       <span id="notifCount"
-            class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg z-40 animate-bounce">
+            class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg z-[70]">
       </span>
 
       <!-- Tooltip -->
-      <div
-        class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8 z-50">
+      <div class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8 z-[80] whitespace-nowrap">
         Tienes mensajes nuevos
       </div>
     </div>
 
-    <!-- 🔓 Botón de Cerrar sesión -->
+    <!-- 🔓 Botón logout -->
     <button id="logoutBtn"
-            class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition z-20">
+            class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition font-medium z-[50]">
       Cerrar sesión
     </button>
   </div>
 </header>
+
 
 
 
