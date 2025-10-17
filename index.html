@@ -37,30 +37,32 @@
   <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md">
   <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">🧼 Ecolimp Dashboard</h1>
   
-  <div class="flex items-center gap-4">
-    <!-- 🔔 Notificaciones -->
-    <div class="relative flex items-center justify-center cursor-pointer group hidden" 
-         id="notifBell" 
-         title="Mensajes nuevos">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-          stroke-width="2" stroke="orange" class="w-7 h-7 animate-pulse">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.937M13 21a2 2 0 01-4 0" />
-      </svg>
-      <span id="notifCount"
-            class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg">
-      </span>
-      <div class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8">
-        Tienes mensajes nuevos
-      </div>
+  <div class="flex items-center gap-4 relative z-20">
+  <!-- 🔔 Notificaciones -->
+  <div class="relative flex items-center justify-center cursor-pointer group" 
+       id="notifBell" 
+       title="Mensajes nuevos"
+       style="display:none; z-index:30;">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+         stroke-width="2" stroke="orange" class="w-7 h-7 animate-pulse relative z-30">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.937M13 21a2 2 0 01-4 0" />
+    </svg>
+    <span id="notifCount"
+          class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg z-40">
+    </span>
+    <div class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8 z-50">
+      Tienes mensajes nuevos
     </div>
-
-    <!-- 🔓 Botón de cierre de sesión -->
-    <button id="logoutBtn" 
-            class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition">
-      Cerrar sesión
-    </button>
   </div>
+
+  <!-- 🔓 Botón de cierre de sesión -->
+  <button id="logoutBtn" 
+          class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition z-20">
+    Cerrar sesión
+  </button>
+</div>
+
 </header>
 
 
