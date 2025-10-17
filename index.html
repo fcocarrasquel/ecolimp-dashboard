@@ -97,6 +97,18 @@
   #notifBell svg {
     filter: drop-shadow(0 0 2px orange);
   }
+  /* 🔴 Badge de notificación junto a la pestaña */
+#notifBadge {
+  animation: pulse 1.5s infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 </style>
 
 </head>
@@ -163,14 +175,18 @@
     <!-- === DASHBOARD === -->
     <section id="dashboardSection" class="hidden">
       <!-- NAV -->
-      <nav class="flex gap-6 mb-6 border-b pb-2">
-        <button id="tabUsers" class="primary-text font-semibold border-b-2 border-[#ff6600] pb-1">
-          Usuarios
-        </button>
-        <button id="tabMessages" class="text-gray-600 hover:text-[#ff6600] transition">
-          Mensajes
-        </button>
-      </nav>
+      <nav class="flex gap-6 border-b border-gray-200 px-6 pt-3 text-gray-700 font-medium">
+  <button id="tabUsers" class="pb-2 border-b-2 border-orange-500 text-orange-600 focus:outline-none">
+    Usuarios
+  </button>
+
+  <button id="tabMessages" class="pb-2 hover:text-orange-600 relative focus:outline-none">
+    Mensajes
+    <span id="notifBadge" 
+          class="absolute -top-2 -right-5 hidden bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md">
+    </span>
+  </button>
+</nav>
 
       <!-- === USUARIOS === -->
       <div id="usersView">
