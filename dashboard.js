@@ -2,6 +2,23 @@
 const SUPABASE_URL = "https://mpfpndofdiwnusrpesnh.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0"; // ⚠️ Usa tu anon key pública
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// === TOAST ===
+function showToast(message, type = "success") {
+  const colors = {
+    success: "#00c851", // verde
+    error: "#ff4444",   // rojo
+    info: "#ff8800"     // naranja
+  };
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "right",
+    backgroundColor: colors[type] || colors.info,
+    stopOnFocus: true
+  }).showToast();
+}
 
 // Elementos del DOM
 const loginSection = document.getElementById("loginSection");
