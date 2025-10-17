@@ -4,50 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ecolimp Dashboard</title>
+
+  <!-- Tailwind y Supabase -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Toastify -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; }
     .primary-bg { background-color: #ff6600; }
     .primary-text { color: #ff6600; }
     .dark-bg { background-color: #111; }
   </style>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 
 <body class="text-gray-900">
-  <!-- Header -->
+  <!-- HEADER -->
   <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md">
-    <h1 class="text-xl font-bold tracking-wide">🧼 Ecolimp Dashboard</h1>
-    <button id="logoutBtn" class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600">Cerrar sesión</button>
+    <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">🧼 Ecolimp Dashboard</h1>
+    <button id="logoutBtn" class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition">
+      Cerrar sesión
+    </button>
   </header>
 
+  <!-- MAIN -->
   <main class="p-6">
-    <!-- LOGIN -->
+    <!-- === LOGIN === -->
     <section id="loginSection" class="max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-lg font-semibold mb-3 text-center primary-text">Ingreso administrador</h2>
+      <h2 class="text-lg font-semibold mb-3 text-center primary-text">Ingreso administrador o cliente</h2>
       <input id="email" type="email" placeholder="Correo" class="w-full border p-2 mb-2 rounded" />
       <input id="password" type="password" placeholder="Contraseña" class="w-full border p-2 mb-4 rounded" />
-      <button id="loginBtn" class="w-full py-2 rounded text-white primary-bg hover:bg-orange-600">Entrar</button>
+      <button id="loginBtn" class="w-full py-2 rounded text-white primary-bg hover:bg-orange-600 transition">
+        Entrar
+      </button>
     </section>
 
-    <!-- DASHBOARD -->
+    <!-- === DASHBOARD === -->
     <section id="dashboardSection" class="hidden">
-      <nav class="flex gap-4 mb-6 border-b pb-2">
-        <button id="tabUsers" class="primary-text font-semibold border-b-2 border-[#ff6600] pb-1">Usuarios</button>
-        <button id="tabMessages" class="text-gray-600 hover:text-[#ff6600]">Mensajes</button>
+      <!-- NAV -->
+      <nav class="flex gap-6 mb-6 border-b pb-2">
+        <button id="tabUsers" class="primary-text font-semibold border-b-2 border-[#ff6600] pb-1">
+          Usuarios
+        </button>
+        <button id="tabMessages" class="text-gray-600 hover:text-[#ff6600] transition">
+          Mensajes
+        </button>
       </nav>
 
       <!-- === USUARIOS === -->
       <div id="usersView">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-[#111]">Panel de Referidos</h2>
-          <button id="refreshBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600">Actualizar</button>
+          <button id="refreshBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600 transition">
+            Actualizar
+          </button>
         </div>
 
-        <!-- Stats -->
-        <div id="stats" class="grid grid-cols-3 gap-4 mb-6">
+        <!-- STATS -->
+        <div id="stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
             <h3 class="text-gray-500 text-sm">Usuarios activos</h3>
             <p id="totalUsers" class="text-2xl font-bold text-[#111]">0</p>
@@ -62,7 +79,7 @@
           </div>
         </div>
 
-        <!-- Tabla de usuarios -->
+        <!-- TABLA DE USUARIOS -->
         <div class="overflow-x-auto">
           <table class="min-w-full bg-white rounded shadow-lg">
             <thead class="dark-bg text-white">
@@ -83,8 +100,12 @@
       <div id="messagesView" class="hidden">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-[#111]">Mensajes Enviados</h2>
-          <button id="refreshMsgsBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600">Actualizar</button>
+          <button id="refreshMsgsBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600 transition">
+            Actualizar
+          </button>
         </div>
+
+        <!-- TABLA DE MENSAJES -->
         <div class="overflow-x-auto">
           <table class="min-w-full bg-white rounded shadow-lg">
             <thead class="dark-bg text-white">
@@ -102,18 +123,25 @@
     </section>
   </main>
 
-  <!-- Modal de Mensaje -->
-  <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+  <!-- === MODAL DE MENSAJE === -->
+  <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h3 class="text-lg font-semibold mb-2">Enviar mensaje a <span id="modalUserName" class="primary-text"></span></h3>
+      <h3 class="text-lg font-semibold mb-2">
+        Enviar mensaje a <span id="modalUserName" class="primary-text"></span>
+      </h3>
       <textarea id="messageContent" class="w-full border rounded p-2 mb-3" rows="4" placeholder="Escribe el mensaje..."></textarea>
       <div class="flex justify-end gap-2">
-        <button onclick="closeMessageModal()" class="px-4 py-2 bg-gray-300 rounded">Cancelar</button>
-        <button id="sendMsgBtn" class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600">Enviar</button>
+        <button onclick="closeMessageModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+          Cancelar
+        </button>
+        <button id="sendMsgBtn" class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600 transition">
+          Enviar
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- SCRIPT PRINCIPAL -->
   <script src="dashboard.js"></script>
 </body>
 </html>
