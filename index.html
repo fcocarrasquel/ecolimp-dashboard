@@ -23,6 +23,11 @@
 
 <body class="text-gray-900">
   <!-- HEADER -->
+  <div id="notifBell" class="relative hidden">
+  <span class="text-2xl">🔔</span>
+  <span id="notifCount" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1">0</span>
+</div>
+
   <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md">
     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">🧼 Ecolimp Dashboard</h1>
     <button id="logoutBtn" class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition">
