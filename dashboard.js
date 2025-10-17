@@ -1,6 +1,6 @@
 // 🚀 Configura tu Supabase
 const SUPABASE_URL = "https://gqjyuhcrzevxkschomje.supabase.co";
-const SUPABASE_KEY = "TU_API_KEY"; // ⚠️ Usa tu anon key pública
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0"; // ⚠️ Usa tu anon key pública
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elementos del DOM
