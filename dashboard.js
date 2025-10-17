@@ -147,8 +147,36 @@ async function loadUserPanel() {
       <td class="px-3 py-2 italic text-gray-400">Solo lectura</td>
     </tr>
   `;
-  updateNotificationBadge();
+  async function updateNotificationBadge() {
+  if (!currentUser || currentUser.email === ADMIN_EMAIL) return; // Solo usuarios normales
+
+  const { data: userData } = await client
+    .from("users")
+    .select("id")
+    .eq("email", currentUser.email)
+    .single();
+
+  if (!userData) return;
+
+  const { count, error } = await client
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userData.id)
+    .eq("status", "pending");
+
+  if (error) return;
+
+  const badge = document.getElementById("notifBadge");
+  if (!badge) return;
+
+  if (count > 0) {
+    badge.textContent = count;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
 }
+
 
 // === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
