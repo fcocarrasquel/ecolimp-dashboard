@@ -1,7 +1,8 @@
 // 🚀 Configura tu Supabase
 const SUPABASE_URL = "https://mpfpndofdiwnusrpesnh.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0"; // ⚠️ Usa tu anon key pública
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0"; 
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // === TOAST ===
 function showToast(message, type = "success") {
   const colors = {
@@ -20,7 +21,11 @@ function showToast(message, type = "success") {
   }).showToast();
 }
 
-// Elementos del DOM
+// === VARIABLES ===
+const ADMIN_EMAIL = "admin@ecolimp.cl";
+let currentUser = null;
+
+// === ELEMENTOS DEL DOM ===
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
 const loginBtn = document.getElementById("loginBtn");
@@ -42,23 +47,36 @@ loginBtn.addEventListener("click", async () => {
   const { data, error } = await client.auth.signInWithPassword({ email, password });
   if (error) return showToast("❌ Credenciales incorrectas", "error");
 
+  currentUser = data.user;
   loginSection.classList.add("hidden");
   dashboardSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
+
+  showToast(`👋 Bienvenido ${currentUser.email}`, "success");
+
   loadUsers();
 });
 
 // === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
   await client.auth.signOut();
+  currentUser = null;
   loginSection.classList.remove("hidden");
   dashboardSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
+  showToast("👋 Sesión cerrada", "info");
 });
 
 // === CARGAR USUARIOS ===
 async function loadUsers() {
-  const { data: users, error } = await client.from("users").select("*");
+  let query = client.from("users").select("*");
+
+  // Si no es admin, muestra solo su usuario
+  if (currentUser && currentUser.email !== ADMIN_EMAIL) {
+    query = query.eq("email", currentUser.email);
+  }
+
+  const { data: users, error } = await query;
   if (error) return showToast("Error cargando usuarios", "error");
 
   document.getElementById("totalUsers").textContent = users.length;
@@ -77,10 +95,14 @@ async function loadUsers() {
       <td class="px-3 py-2">${u.referrals_count}</td>
       <td class="px-3 py-2 font-semibold text-[#ff6600]">$${u.total_balance}</td>
       <td class="px-3 py-2">${new Date(u.cycle_end).toLocaleDateString()}</td>
-      <td class="px-3 py-2 flex justify-center gap-2">
-        <button onclick="confirmReferral('${u.id}')" class="bg-[#ff6600] text-white px-3 py-1 rounded hover:bg-orange-600">+ Referido</button>
-        <button onclick="openMessageModal('${u.id}', '${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩</button>
-      </td>
+      ${
+        currentUser.email === ADMIN_EMAIL
+          ? `<td class="px-3 py-2 flex justify-center gap-2">
+              <button onclick="confirmReferral('${u.id}')" class="bg-[#ff6600] text-white px-3 py-1 rounded hover:bg-orange-600">+ Referido</button>
+              <button onclick="openMessageModal('${u.id}', '${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩</button>
+            </td>`
+          : `<td class="px-3 py-2 text-gray-500 italic text-center">Solo lectura</td>`
+      }
     `;
     table.appendChild(row);
   });
@@ -89,18 +111,31 @@ async function loadUsers() {
 // === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
   const { error } = await client.rpc("add_referral_bonus", { user_id: userId });
-  if (error) return showToast("Error al confirmar referido" , "error");
-  showToast("✅ Referido confirmado" , "error");
+  if (error) return showToast("Error al confirmar referido", "error");
+  showToast("✅ Referido confirmado", "success");
   loadUsers();
 }
 
 // === CARGAR MENSAJES ===
 async function loadMessages() {
-  const { data: messages, error } = await client
+  let query = client
     .from("messages")
     .select("*, users(name)")
     .order("sent_at", { ascending: false });
-  if (error) return showToast("Error cargando mensajes" , "error");
+
+  if (currentUser && currentUser.email !== ADMIN_EMAIL) {
+    // Filtrar solo mensajes del usuario actual
+    const { data: userData } = await client
+      .from("users")
+      .select("id")
+      .eq("email", currentUser.email)
+      .single();
+
+    if (userData) query = query.eq("user_id", userData.id);
+  }
+
+  const { data: messages, error } = await query;
+  if (error) return showToast("Error cargando mensajes", "error");
 
   const table = document.getElementById("messagesTable");
   table.innerHTML = "";
@@ -147,16 +182,18 @@ function closeMessageModal() {
   document.getElementById("messageModal").classList.add("hidden");
   document.getElementById("messageContent").value = "";
 }
+
 document.getElementById("sendMsgBtn").addEventListener("click", async () => {
   const message = document.getElementById("messageContent").value.trim();
-  if (!message) return showToast("Mensaje vacío" , "error");
+  if (!message) return showToast("Mensaje vacío", "error");
 
   const { error } = await client.from("messages").insert([{ user_id: selectedUserId, message }]);
   if (error) return showToast("Error al guardar mensaje", "error");
-  showToast("✅ Mensaje guardado correctamente", "error");
+  showToast("✅ Mensaje guardado correctamente", "success");
   closeMessageModal();
   loadMessages();
 });
+
 
 
 
