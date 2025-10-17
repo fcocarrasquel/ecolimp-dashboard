@@ -18,15 +18,42 @@
     .primary-bg { background-color: #ff6600; }
     .primary-text { color: #ff6600; }
     .dark-bg { background-color: #111; }
+    #notifBell {
+  transition: transform 0.2s ease-in-out;
+}
+#notifBell:hover {
+  transform: scale(1.15);
+}
+#notifCount {
+  min-width: 18px;
+  text-align: center;
+}
+
   </style>
 </head>
 
 <body class="text-gray-900">
   <!-- HEADER -->
+  
   <div id="notifBell" class="relative hidden">
   <span class="text-2xl">🔔</span>
   <span id="notifCount" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1">0</span>
 </div>
+  <!-- 🔔 Notificaciones -->
+<div class="relative flex items-center justify-center mr-4 cursor-pointer group" id="notifBell" title="Mensajes nuevos" style="display:none;">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+       stroke-width="2" stroke="orange" class="w-7 h-7 animate-pulse">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.937M13 21a2 2 0 01-4 0" />
+  </svg>
+  <span id="notifCount"
+        class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg">
+  </span>
+  <div class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8">
+    Tienes mensajes nuevos
+  </div>
+</div>
+
 
   <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md">
     <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">🧼 Ecolimp Dashboard</h1>
