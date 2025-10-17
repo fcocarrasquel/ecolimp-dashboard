@@ -1,6 +1,7 @@
 // === CONFIG SUPABASE ===
 const SUPABASE_URL = "https://mpfpndofdiwnusrpesnh.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZnBuZG9mZGl3bnVzcnBlc25oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NDI1MzUsImV4cCI6MjA3NjExODUzNX0.QthlrDtg5xkYipx6aaBXOlDbUmQh5F-31PSBvMt_yN0";
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ADMIN_EMAIL = "admin@ecolimp.cl";
@@ -41,13 +42,20 @@ loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password,
+  });
   if (error) return showToast("❌ Credenciales incorrectas", "error");
 
   currentUser = data.user;
 
   // Obtener rol del usuario
-  const { data: userInfo } = await client.from("users").select("*").eq("email", currentUser.email).single();
+  const { data: userInfo } = await client
+    .from("users")
+    .select("*")
+    .eq("email", currentUser.email)
+    .single();
   if (!userInfo) return showToast("Usuario no encontrado", "error");
 
   currentUser.role = userInfo.role;
@@ -57,15 +65,19 @@ loginBtn.addEventListener("click", async () => {
   dashboardSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
 
-  if (userInfo.role === "admin") loadUsers();
-  else loadUserPanel();
+  if (userInfo.role === "admin") {
+    loadUsers();
+  } else {
+    loadUserPanel();
+    updateNotificationBadge();
+  }
 });
 
 // === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
   await client.auth.signOut();
 
-  // Limpiar cualquier información visual o de sesión
+  // Limpiar visual
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
   document.getElementById("usersTable").innerHTML = "";
@@ -74,24 +86,17 @@ logoutBtn.addEventListener("click", async () => {
   document.getElementById("totalBalance").textContent = "$0";
   document.getElementById("totalReferrals").textContent = "0";
 
-  // Ocultar secciones y botones
   loginSection.classList.remove("hidden");
   dashboardSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
 
-  // Ocultar notificaciones si estaban visibles
-  const bell = document.getElementById("notifBell");
-  if (bell) bell.classList.add("hidden");
+  const badge = document.getElementById("notifBadge");
+  if (badge) badge.classList.add("hidden");
 
-  // Mostrar mensaje elegante y reiniciar visualmente
   showToast("👋 Sesión cerrada correctamente", "info");
 
-  // Esperar 1 segundo para UX y recargar limpio
-  setTimeout(() => {
-    location.reload();
-  }, 1000);
+  setTimeout(() => location.reload(), 1000);
 });
-
 
 // === CARGAR PANEL ADMIN ===
 async function loadUsers() {
@@ -99,9 +104,15 @@ async function loadUsers() {
   if (error) return showToast("Error cargando usuarios", "error");
 
   document.getElementById("totalUsers").textContent = users.length;
-  const totalBalance = users.reduce((acc, u) => acc + (u.total_balance || 0), 0);
+  const totalBalance = users.reduce(
+    (acc, u) => acc + (u.total_balance || 0),
+    0
+  );
   document.getElementById("totalBalance").textContent = `$${totalBalance}`;
-  const totalReferrals = users.reduce((acc, u) => acc + (u.referrals_count || 0), 0);
+  const totalReferrals = users.reduce(
+    (acc, u) => acc + (u.referrals_count || 0),
+    0
+  );
   document.getElementById("totalReferrals").textContent = totalReferrals;
 
   const table = document.getElementById("usersTable");
@@ -113,12 +124,17 @@ async function loadUsers() {
       <td class="px-3 py-2 text-left font-medium">${u.name}</td>
       <td class="px-3 py-2">${u.referrals_count}</td>
       <td class="px-3 py-2 font-semibold text-[#ff6600]">$${u.total_balance}</td>
-      <td class="px-3 py-2">${new Date(u.cycle_end).toLocaleDateString()}</td>
+      <td class="px-3 py-2">${new Date(
+        u.cycle_end
+      ).toLocaleDateString()}</td>
       <td class="px-3 py-2 flex justify-center gap-2">
-        <button onclick="confirmReferral('${u.id}')" class="bg-[#ff6600] text-white px-3 py-1 rounded hover:bg-orange-600">+ Referido</button>
-        <button onclick="openMessageModal('${u.id}', '${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩</button>
-      </td>
-    `;
+        <button onclick="confirmReferral('${
+          u.id
+        }')" class="bg-[#ff6600] text-white px-3 py-1 rounded hover:bg-orange-600">+ Referido</button>
+        <button onclick="openMessageModal('${
+          u.id
+        }','${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩</button>
+      </td>`;
     table.appendChild(row);
   });
 }
@@ -145,38 +161,8 @@ async function loadUserPanel() {
       <td class="px-3 py-2 font-semibold text-[#ff6600]">$${userData.total_balance}</td>
       <td class="px-3 py-2">${new Date(userData.cycle_end).toLocaleDateString()}</td>
       <td class="px-3 py-2 italic text-gray-400">Solo lectura</td>
-    </tr>
-  `;
-  async function updateNotificationBadge() {
-  if (!currentUser || currentUser.email === ADMIN_EMAIL) return; // Solo usuarios normales
-
-  const { data: userData } = await client
-    .from("users")
-    .select("id")
-    .eq("email", currentUser.email)
-    .single();
-
-  if (!userData) return;
-
-  const { count, error } = await client
-    .from("messages")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userData.id)
-    .eq("status", "pending");
-
-  if (error) return;
-
-  const badge = document.getElementById("notifBadge");
-  if (!badge) return;
-
-  if (count > 0) {
-    badge.textContent = count;
-    badge.classList.remove("hidden");
-  } else {
-    badge.classList.add("hidden");
-  }
+    </tr>`;
 }
-
 
 // === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
@@ -188,7 +174,10 @@ async function confirmReferral(userId) {
 
 // === CARGAR MENSAJES ===
 async function loadMessages() {
-  let query = client.from("messages").select("*, users(name)").order("sent_at", { ascending: false });
+  let query = client
+    .from("messages")
+    .select("*, users(name)")
+    .order("sent_at", { ascending: false });
 
   if (currentUser && currentUser.email !== ADMIN_EMAIL) {
     const { data: userData } = await client
@@ -196,18 +185,22 @@ async function loadMessages() {
       .select("id")
       .eq("email", currentUser.email)
       .single();
-
     if (userData) query = query.eq("user_id", userData.id);
   }
 
   const { data: messages, error } = await query;
   if (error) return showToast("Error cargando mensajes", "error");
 
-  // Cambiar estado de pending → entregado
+  // Marcar pendientes como entregados
   if (currentUser && currentUser.email !== ADMIN_EMAIL) {
-    const pendingIds = messages.filter((m) => m.status === "pending").map((m) => m.id);
+    const pendingIds = messages
+      .filter((m) => m.status === "pending")
+      .map((m) => m.id);
     if (pendingIds.length > 0) {
-      await client.from("messages").update({ status: "entregado" }).in("id", pendingIds);
+      await client
+        .from("messages")
+        .update({ status: "entregado" })
+        .in("id", pendingIds);
     }
   }
 
@@ -229,41 +222,31 @@ async function loadMessages() {
       <td class="px-3 py-2 text-left">${m.users?.name || "-"}</td>
       <td class="px-3 py-2 text-left">${m.message}</td>
       <td class="px-3 py-2">${new Date(m.sent_at).toLocaleString()}</td>
-      <td class="px-3 py-2">${estado}</td>
-    `;
+      <td class="px-3 py-2">${estado}</td>`;
     table.appendChild(row);
   });
 
-  async function updateNotificationBadge() {
-  try {
-    if (!currentUser || currentUser.email === ADMIN_EMAIL) return; // Solo usuarios normales
+  updateNotificationBadge();
+}
 
-    // Buscar el usuario actual
-    const { data: userData, error: userError } = await client
+// === CONTADOR DE NOTIFICACIONES ===
+async function updateNotificationBadge() {
+  try {
+    if (!currentUser || currentUser.email === ADMIN_EMAIL) return;
+
+    const { data: userData } = await client
       .from("users")
       .select("id")
       .eq("email", currentUser.email)
       .single();
-
-    if (userError) {
-      console.error("Error obteniendo usuario:", userError);
-      return;
-    }
     if (!userData) return;
 
-    // Contar mensajes pendientes
-    const { count, error } = await client
+    const { count } = await client
       .from("messages")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userData.id)
       .eq("status", "pending");
 
-    if (error) {
-      console.error("Error contando mensajes:", error);
-      return;
-    }
-
-    // Actualizar badge visual
     const badge = document.getElementById("notifBadge");
     if (!badge) return;
 
@@ -273,39 +256,8 @@ async function loadMessages() {
     } else {
       badge.classList.add("hidden");
     }
-
   } catch (err) {
-    console.error("Error general en updateNotificationBadge:", err);
-  }
-}
-
-
-// === ACTUALIZAR CONTADOR DE NOTIFICACIONES ===
-async function updateNotificationBadge() {
-  if (!currentUser || currentUser.email === ADMIN_EMAIL) return;
-
-  const { data: userData } = await client
-    .from("users")
-    .select("id")
-    .eq("email", currentUser.email)
-    .single();
-
-  if (!userData) return;
-
-  const { count } = await client
-    .from("messages")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userData.id)
-    .eq("status", "pending");
-
-  const bell = document.getElementById("notifBell");
-  const badge = document.getElementById("notifCount");
-
-  if (count > 0) {
-    bell.classList.remove("hidden");
-    badge.textContent = count;
-  } else {
-    bell.classList.add("hidden");
+    console.error("Error en updateNotificationBadge:", err);
   }
 }
 
@@ -328,7 +280,7 @@ tabMessages.addEventListener("click", () => {
   loadMessages();
 });
 
-// === MODAL ===
+// === MODAL MENSAJES ===
 let selectedUserId = null;
 function openMessageModal(userId, name) {
   selectedUserId = userId;
@@ -343,7 +295,9 @@ document.getElementById("sendMsgBtn").addEventListener("click", async () => {
   const message = document.getElementById("messageContent").value.trim();
   if (!message) return showToast("Mensaje vacío", "error");
 
-  const { error } = await client.from("messages").insert([{ user_id: selectedUserId, message }]);
+  const { error } = await client
+    .from("messages")
+    .insert([{ user_id: selectedUserId, message }]);
   if (error) return showToast("Error al guardar mensaje", "error");
 
   showToast("✅ Mensaje guardado correctamente", "success");
