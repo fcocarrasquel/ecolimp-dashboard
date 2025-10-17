@@ -3,14 +3,21 @@ const SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
 const SUPABASE_KEY = "TU_API_KEY";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Elementos
+// Elementos del DOM
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const refreshBtn = document.getElementById("refreshBtn");
+const refreshMsgsBtn = document.getElementById("refreshMsgsBtn");
 
-// 🔐 Login
+// Tabs
+const tabUsers = document.getElementById("tabUsers");
+const tabMessages = document.getElementById("tabMessages");
+const usersView = document.getElementById("usersView");
+const messagesView = document.getElementById("messagesView");
+
+// === LOGIN ===
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -21,10 +28,10 @@ loginBtn.addEventListener("click", async () => {
   loginSection.classList.add("hidden");
   dashboardSection.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
-  loadDashboard();
+  loadUsers();
 });
 
-// 🔒 Logout
+// === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
   await supabase.auth.signOut();
   loginSection.classList.remove("hidden");
@@ -32,13 +39,10 @@ logoutBtn.addEventListener("click", async () => {
   logoutBtn.classList.add("hidden");
 });
 
-// 📊 Cargar datos
-async function loadDashboard() {
+// === CARGAR USUARIOS ===
+async function loadUsers() {
   const { data: users, error } = await supabase.from("users").select("*");
-  if (error) {
-    alert("Error cargando datos");
-    return;
-  }
+  if (error) return alert("Error cargando usuarios");
 
   document.getElementById("totalUsers").textContent = users.length;
   const totalBalance = users.reduce((acc, u) => acc + (u.total_balance || 0), 0);
@@ -48,7 +52,6 @@ async function loadDashboard() {
 
   const table = document.getElementById("usersTable");
   table.innerHTML = "";
-
   users.forEach(u => {
     const row = document.createElement("tr");
     row.classList.add("border-b", "hover:bg-gray-50");
@@ -59,46 +62,83 @@ async function loadDashboard() {
       <td class="px-3 py-2">${new Date(u.cycle_end).toLocaleDateString()}</td>
       <td class="px-3 py-2 flex justify-center gap-2">
         <button onclick="confirmReferral('${u.id}')" class="bg-[#ff6600] text-white px-3 py-1 rounded hover:bg-orange-600">+ Referido</button>
-        <button onclick="openMessageModal('${u.id}', '${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩 Mensaje</button>
+        <button onclick="openMessageModal('${u.id}', '${u.name}')" class="bg-black text-white px-3 py-1 rounded hover:bg-gray-800">📩</button>
       </td>
     `;
     table.appendChild(row);
   });
 }
 
-// ➕ Confirmar nuevo referido
+// === CONFIRMAR REFERIDO ===
 async function confirmReferral(userId) {
-  const { data, error } = await supabase.rpc("add_referral_bonus", { user_id: userId });
+  const { error } = await supabase.rpc("add_referral_bonus", { user_id: userId });
   if (error) return alert("Error al confirmar referido");
-  alert("✅ Referido confirmado y saldo actualizado");
-  loadDashboard();
+  alert("✅ Referido confirmado");
+  loadUsers();
 }
 
-// 🔄 Botón refrescar
-refreshBtn.addEventListener("click", loadDashboard);
+// === CARGAR MENSAJES ===
+async function loadMessages() {
+  const { data: messages, error } = await supabase
+    .from("messages")
+    .select("*, users(name)")
+    .order("sent_at", { ascending: false });
+  if (error) return alert("Error cargando mensajes");
 
-// ✉️ Modal de mensaje
+  const table = document.getElementById("messagesTable");
+  table.innerHTML = "";
+  messages.forEach(m => {
+    const row = document.createElement("tr");
+    row.classList.add("border-b", "hover:bg-gray-50");
+    row.innerHTML = `
+      <td class="px-3 py-2 text-left">${m.users?.name || "-"}</td>
+      <td class="px-3 py-2 text-left">${m.message}</td>
+      <td class="px-3 py-2">${new Date(m.sent_at).toLocaleString()}</td>
+      <td class="px-3 py-2">${m.status}</td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+// === BOTONES ===
+refreshBtn.addEventListener("click", loadUsers);
+refreshMsgsBtn.addEventListener("click", loadMessages);
+
+// === TABS ===
+tabUsers.addEventListener("click", () => {
+  usersView.classList.remove("hidden");
+  messagesView.classList.add("hidden");
+  tabUsers.classList.add("primary-text", "border-b-2", "border-[#ff6600]");
+  tabMessages.classList.remove("primary-text", "border-b-2", "border-[#ff6600]");
+});
+tabMessages.addEventListener("click", () => {
+  messagesView.classList.remove("hidden");
+  usersView.classList.add("hidden");
+  loadMessages();
+  tabMessages.classList.add("primary-text", "border-b-2", "border-[#ff6600]");
+  tabUsers.classList.remove("primary-text", "border-b-2", "border-[#ff6600]");
+});
+
+// === MODAL DE MENSAJE ===
 let selectedUserId = null;
-
 function openMessageModal(userId, name) {
   selectedUserId = userId;
   document.getElementById("modalUserName").textContent = name;
   document.getElementById("messageModal").classList.remove("hidden");
 }
-
 function closeMessageModal() {
   document.getElementById("messageModal").classList.add("hidden");
   document.getElementById("messageContent").value = "";
 }
-
 document.getElementById("sendMsgBtn").addEventListener("click", async () => {
   const message = document.getElementById("messageContent").value.trim();
-  if (!message) return alert("El mensaje no puede estar vacío");
+  if (!message) return alert("Mensaje vacío");
 
   const { error } = await supabase.from("messages").insert([{ user_id: selectedUserId, message }]);
-  if (error) return alert("Error al guardar el mensaje");
-
-  alert("✅ Mensaje registrado correctamente");
+  if (error) return alert("Error al guardar mensaje");
+  alert("✅ Mensaje guardado correctamente");
   closeMessageModal();
+  loadMessages();
 });
+
 
