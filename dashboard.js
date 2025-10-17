@@ -64,11 +64,34 @@ loginBtn.addEventListener("click", async () => {
 // === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
   await client.auth.signOut();
-  currentUser = null;
+
+  // Limpiar cualquier información visual o de sesión
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("usersTable").innerHTML = "";
+  document.getElementById("messagesTable").innerHTML = "";
+  document.getElementById("totalUsers").textContent = "0";
+  document.getElementById("totalBalance").textContent = "$0";
+  document.getElementById("totalReferrals").textContent = "0";
+
+  // Ocultar secciones y botones
   loginSection.classList.remove("hidden");
   dashboardSection.classList.add("hidden");
   logoutBtn.classList.add("hidden");
+
+  // Ocultar notificaciones si estaban visibles
+  const bell = document.getElementById("notifBell");
+  if (bell) bell.classList.add("hidden");
+
+  // Mostrar mensaje elegante y reiniciar visualmente
+  showToast("👋 Sesión cerrada correctamente", "info");
+
+  // Esperar 1 segundo para UX y recargar limpio
+  setTimeout(() => {
+    location.reload();
+  }, 1000);
 });
+
 
 // === CARGAR PANEL ADMIN ===
 async function loadUsers() {
