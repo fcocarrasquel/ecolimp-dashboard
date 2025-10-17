@@ -7,26 +7,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f9f9f9;
-    }
-    .primary-bg {
-      background-color: #ff6600;
-    }
-    .primary-text {
-      color: #ff6600;
-    }
-    .dark-bg {
-      background-color: #111;
-    }
+    body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; }
+    .primary-bg { background-color: #ff6600; }
+    .primary-text { color: #ff6600; }
+    .dark-bg { background-color: #111; }
   </style>
 </head>
 
 <body class="text-gray-900">
   <!-- Header -->
   <header class="dark-bg text-white p-4 flex justify-between items-center shadow-md">
-    <h1 class="text-xl font-bold tracking-wide">🧼 Ecolimp Referidos</h1>
+    <h1 class="text-xl font-bold tracking-wide">🧼 Ecolimp Dashboard</h1>
     <button id="logoutBtn" class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600">Cerrar sesión</button>
   </header>
 
@@ -41,41 +32,70 @@
 
     <!-- DASHBOARD -->
     <section id="dashboardSection" class="hidden">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-[#111]">Panel de Referidos</h2>
-        <button id="refreshBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600">Actualizar</button>
+      <nav class="flex gap-4 mb-6 border-b pb-2">
+        <button id="tabUsers" class="primary-text font-semibold border-b-2 border-[#ff6600] pb-1">Usuarios</button>
+        <button id="tabMessages" class="text-gray-600 hover:text-[#ff6600]">Mensajes</button>
+      </nav>
+
+      <!-- === USUARIOS === -->
+      <div id="usersView">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-[#111]">Panel de Referidos</h2>
+          <button id="refreshBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600">Actualizar</button>
+        </div>
+
+        <!-- Stats -->
+        <div id="stats" class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
+            <h3 class="text-gray-500 text-sm">Usuarios activos</h3>
+            <p id="totalUsers" class="text-2xl font-bold text-[#111]">0</p>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
+            <h3 class="text-gray-500 text-sm">Saldo total</h3>
+            <p id="totalBalance" class="text-2xl font-bold text-[#111]">$0</p>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
+            <h3 class="text-gray-500 text-sm">Referidos activos</h3>
+            <p id="totalReferrals" class="text-2xl font-bold text-[#111]">0</p>
+          </div>
+        </div>
+
+        <!-- Tabla de usuarios -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white rounded shadow-lg">
+            <thead class="dark-bg text-white">
+              <tr>
+                <th class="py-2 px-3 text-left">Cliente</th>
+                <th class="py-2 px-3">Referidos</th>
+                <th class="py-2 px-3">Saldo</th>
+                <th class="py-2 px-3">Ciclo</th>
+                <th class="py-2 px-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable" class="text-center"></tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Stats -->
-      <div id="stats" class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-          <h3 class="text-gray-500 text-sm">Usuarios activos</h3>
-          <p id="totalUsers" class="text-2xl font-bold text-[#111]">0</p>
+      <!-- === MENSAJES === -->
+      <div id="messagesView" class="hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-[#111]">Mensajes Enviados</h2>
+          <button id="refreshMsgsBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600">Actualizar</button>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-          <h3 class="text-gray-500 text-sm">Saldo total</h3>
-          <p id="totalBalance" class="text-2xl font-bold text-[#111]">$0</p>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white rounded shadow-lg">
+            <thead class="dark-bg text-white">
+              <tr>
+                <th class="py-2 px-3 text-left">Cliente</th>
+                <th class="py-2 px-3 text-left">Mensaje</th>
+                <th class="py-2 px-3">Fecha</th>
+                <th class="py-2 px-3">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="messagesTable" class="text-center"></tbody>
+          </table>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-          <h3 class="text-gray-500 text-sm">Referidos activos</h3>
-          <p id="totalReferrals" class="text-2xl font-bold text-[#111]">0</p>
-        </div>
-      </div>
-
-      <!-- Tabla -->
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded shadow-lg">
-          <thead class="dark-bg text-white">
-            <tr>
-              <th class="py-2 px-3 text-left">Cliente</th>
-              <th class="py-2 px-3">Referidos</th>
-              <th class="py-2 px-3">Saldo</th>
-              <th class="py-2 px-3">Ciclo</th>
-              <th class="py-2 px-3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="usersTable" class="text-center"></tbody>
-        </table>
       </div>
     </section>
   </main>
