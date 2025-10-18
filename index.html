@@ -156,10 +156,6 @@
     </button>
   </div>
 </header>
-
-
-
-
   <!-- MAIN -->
   <main class="p-6">
     <!-- === LOGIN === -->
@@ -171,6 +167,19 @@
         Entrar
       </button>
     </section>
+    <div id="registerSection" class="hidden p-4 text-center">
+  <h2 class="text-xl font-semibold mb-2">Crear cuenta nueva</h2>
+  <input id="regName" type="text" placeholder="Nombre completo" class="border rounded px-3 py-2 mb-2 w-64"><br>
+  <input id="regEmail" type="email" placeholder="Correo electrónico" class="border rounded px-3 py-2 mb-2 w-64"><br>
+  <input id="regPass" type="password" placeholder="Contraseña" class="border rounded px-3 py-2 mb-3 w-64"><br>
+  <button id="registerBtn" class="bg-[#ff6600] text-white px-4 py-2 rounded hover:bg-orange-600">
+    Crear cuenta
+  </button>
+</div>
+
+<p class="text-sm text-gray-600 mt-2">
+  ¿No tienes cuenta? <span id="goRegister" class="text-[#ff6600] cursor-pointer hover:underline">Regístrate</span>
+</p>
 
     <!-- === DASHBOARD === -->
     <section id="dashboardSection" class="hidden">
