@@ -98,6 +98,46 @@ logoutBtn.addEventListener("click", async () => {
   setTimeout(() => location.reload(), 1000);
 });
 
+const registerSection = document.getElementById("registerSection");
+const goRegister = document.getElementById("goRegister");
+const registerBtn = document.getElementById("registerBtn");
+
+goRegister.addEventListener("click", () => {
+  loginSection.classList.add("hidden");
+  registerSection.classList.remove("hidden");
+});
+
+registerBtn.addEventListener("click", async () => {
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPass").value.trim();
+
+  if (!name || !email || !password)
+    return showToast("Por favor completa todos los campos", "error");
+
+  // Crear usuario en Auth
+  const { data, error } = await client.auth.signUp({ email, password });
+  if (error) return showToast("Error creando usuario", "error");
+
+  // Insertar registro adicional en tabla "users"
+  await client.from("users").insert([
+    {
+      name,
+      email,
+      role: "user",
+      referrals_count: 0,
+      total_balance: 0,
+      cycle_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 días
+    },
+  ]);
+
+  showToast("✅ Cuenta creada correctamente, ahora inicia sesión", "success");
+
+  registerSection.classList.add("hidden");
+  loginSection.classList.remove("hidden");
+});
+
+
 // === CARGAR PANEL ADMIN ===
 async function loadUsers() {
   const { data: users, error } = await client.from("users").select("*");
