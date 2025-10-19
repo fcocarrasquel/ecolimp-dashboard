@@ -11,7 +11,6 @@
   <!-- ✅ Toastify (notificaciones visuales) -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
   <!-- ✅ Estilos globales -->
   <style>
     /* Tipografía y fondo general */
@@ -21,7 +20,6 @@
       margin: 0;
       padding: 0;
     }
-
     /* Colores institucionales */
     .primary-bg { background-color: #ff6600; }
     .primary-text { color: #ff6600; }
@@ -30,7 +28,6 @@
       position: relative;      /* ✅ Necesario para z-index del header */
       z-index: 40;
     }
-
     /* 🔔 Campana de notificación */
     #notifBell {
       position: relative;      /* ✅ Para que los elementos hijos se posicionen correctamente */
@@ -44,7 +41,6 @@
     #notifBell:hover {
       transform: scale(1.15);
     }
-
     /* 🔴 Contador */
     #notifCount {
       position: absolute;
@@ -60,7 +56,6 @@
       padding: 2px 4px;
       box-shadow: 0 0 0 2px #111;
     }
-
     /* Panel desplegable de notificaciones */
     #notifPanel {
       position: absolute;
@@ -88,12 +83,13 @@
   <!-- === HEADER === -->
   <header class="dark-bg text-white py-4 px-6 flex justify-between items-center shadow-md">
     <div class="flex items-center gap-3">
-      <img src="https://scontent.fccs3-1.fna.fbcdn.net/v/t39.30808-6/294846936_105825492270263_5024253835597845073_n.png?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=WUELsw3pMPQQ7kNvgGcRzHV&_nc_zt=23&_nc_ht=scontent.fccs3-1.fna&_nc_gid=AmWwvPGx5kkJglr8n1u7nKR&oh=00_AYDHbFHl-n1NX-_G1I1nXCcz3Z1NZuqDRsjqvB3qwDQNlA&oe=671CF8E7"
+      <img
+        src="https://via.placeholder.com/40"
         alt="Logo Ecolimp" class="h-10 rounded-full" />
       <h1 class="text-xl font-bold">Ecolimp Dashboard</h1>
     </div>
     <div class="flex items-center gap-6">
-      <span id="userEmail" class="text-sm">Cargando...</span>
+      <span class="text-sm" id="userEmail">Cargando...</span>
       <div style="position:relative;">
         <div id="notifBell">
           <span style="font-size:1.5rem;">🔔</span>
@@ -101,29 +97,27 @@
         </div>
         <div id="notifPanel" class="hidden p-3"></div>
       </div>
-      <button onclick="confirmLogout()" class="px-4 py-1 bg-red-600 rounded hover:bg-red-700">Cerrar sesión</button>
+      <button class="px-4 py-1 bg-red-600 rounded hover:bg-red-700" onclick="confirmLogout()">Cerrar sesión</button>
     </div>
   </header>
-
   <!-- === CONTENEDOR PRINCIPAL === -->
   <main class="px-6 py-8">
     <!-- Pestañas -->
     <div class="flex gap-2 mb-6">
-      <button onclick="goToTab('messages')" id="tabMessages" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">💬 Mensajes</button>
-      <button onclick="goToTab('stats')" id="tabStats" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">📊 Estadísticas</button>
-      <button onclick="goToTab('routes')" id="tabRoutes" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">🗺️ Rutas</button>
+      <button class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition" id="tabMessages" onclick="goToTab('messages')">💬 Mensajes</button>
+      <button class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition" id="tabStats" onclick="goToTab('stats')">📊 Estadísticas</button>
+      <button class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition" id="tabRoutes" onclick="goToTab('routes')">🗺️ Rutas</button>
     </div>
-
     <!-- Vista: Mensajes -->
     <section id="viewMessages" class="hidden">
       <div class="bg-white p-6 rounded shadow-md mb-4">
         <h2 class="text-2xl font-semibold mb-4 primary-text">📬 Mensajes de usuarios</h2>
         <div class="flex gap-2 mb-4">
-          <button onclick="openModal()" class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600 transition">📨 Enviar mensaje individual</button>
-          <button onclick="openGlobalModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">📢 Enviar aviso global</button>
+          <button class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600 transition" onclick="openModal()">📨 Enviar mensaje individual</button>
+          <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" onclick="openGlobalModal()">📢 Enviar aviso global</button>
         </div>
         <div class="mb-4 flex gap-2 items-center">
-          <input id="searchUser" type="text" placeholder="🔍 Buscar por usuario..." class="border px-3 py-2 rounded flex-1" />
+          <input id="searchUser" type="text" placeholder="🔍 Buscar por usuario..." class="border px-3 py-2 rounded flex-1"/>
           <select id="filterRead" class="border px-3 py-2 rounded">
             <option value="all">Todos</option>
             <option value="unread">No leídos</option>
@@ -140,33 +134,30 @@
         </div>
       </div>
     </section>
-
     <!-- Vista: Estadísticas -->
     <section id="viewStats" class="hidden">
       <h2 class="text-2xl font-semibold mb-4 primary-text">📊 Estadísticas de la app</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-white p-6 rounded shadow-md">
           <p class="text-gray-600 text-sm">Total de usuarios</p>
-          <p id="statUsers" class="text-3xl font-bold primary-text">0</p>
+          <p class="text-3xl font-bold primary-text" id="statUsers">0</p>
         </div>
         <div class="bg-white p-6 rounded shadow-md">
           <p class="text-gray-600 text-sm">Puntos canjeados (total)</p>
-          <p id="statPoints" class="text-3xl font-bold primary-text">0</p>
+          <p class="text-3xl font-bold primary-text" id="statPoints">0</p>
         </div>
         <div class="bg-white p-6 rounded shadow-md">
           <p class="text-gray-600 text-sm">Reportes realizados</p>
-          <p id="statReports" class="text-3xl font-bold primary-text">0</p>
+          <p class="text-3xl font-bold primary-text" id="statReports">0</p>
         </div>
       </div>
-
       <div class="bg-white p-6 rounded shadow-md mb-6">
         <h3 class="text-xl font-semibold mb-3">👥 Usuarios registrados</h3>
-        <input id="searchStatsUser" type="text" placeholder="🔍 Buscar por nombre o email..." class="border px-3 py-2 rounded w-full mb-3" />
+        <input id="searchStatsUser" type="text" placeholder="🔍 Buscar por nombre o email..." class="border px-3 py-2 rounded w-full mb-3"/>
         <div id="usersList" class="space-y-2 max-h-96 overflow-y-auto">
           <p class="text-gray-500">Cargando usuarios...</p>
         </div>
       </div>
-
       <div class="bg-white p-6 rounded shadow-md">
         <h3 class="text-xl font-semibold mb-3">📋 Reportes de contenedores</h3>
         <div id="reportsList" class="space-y-2 max-h-96 overflow-y-auto">
@@ -174,16 +165,14 @@
         </div>
       </div>
     </section>
-
     <!-- Vista: Rutas -->
     <section id="viewRoutes" class="hidden">
       <h2 class="text-2xl font-semibold mb-4 primary-text">🗺️ Gestión de rutas y contenedores</h2>
       <p class="text-gray-600">Próximamente: mapa interactivo con contenedores y rutas óptimas.</p>
     </section>
   </main>
-
   <!-- === MODAL DE MENSAJE === -->
-  <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="messageModal">
+  <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded shadow-md w-96">
       <h2 class="text-lg font-semibold mb-3">✉️ Enviar mensaje</h2>
       <select id="modalRecipient" class="w-full border px-3 py-2 rounded mb-3">
@@ -196,7 +185,6 @@
       </div>
     </div>
   </div>
-
   <div id="globalMsgModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
     <div class="bg-white p-6 rounded shadow-md w-96">
       <h2 class="text-lg font-semibold mb-3">📢 Enviar aviso global</h2>
@@ -208,8 +196,31 @@
       </div>
     </div>
   </div>
-
   <!-- === SCRIPT PRINCIPAL === -->
   <script src="dashboard.js"></script>
+  <script>
+function openGlobalModal() {
+  document.getElementById("globalMsgModal").classList.remove("hidden");
+}
+function closeGlobalModal() {
+  document.getElementById("globalMsgModal").classList.add("hidden");
+  document.getElementById("globalMsgContent").value = "";
+}
+
+document.getElementById("sendGlobalBtn").addEventListener("click", async () => {
+  const msg = document.getElementById("globalMsgContent").value.trim();
+  if (!msg) return showToast("Mensaje vacío", "error");
+  const { data: users } = await client.from("users").select("id");
+  const inserts = users.map((u) => ({
+    user_id: u.id,
+    message: msg,
+    status: "pending",
+  }));
+  const { error } = await client.from("messages").insert(inserts);
+  if (error) return showToast("Error al enviar global", "error");
+  showToast("📢 Mensaje enviado a todos los usuarios", "success");
+  closeGlobalModal();
+});
+  </script>
 </body>
 </html>
