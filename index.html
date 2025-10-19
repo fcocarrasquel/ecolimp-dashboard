@@ -84,7 +84,7 @@
   <header class="dark-bg text-white py-4 px-6 flex justify-between items-center shadow-md">
     <div class="flex items-center gap-3">
       <img
-        src="https://via.placeholder.com/40"
+              src="https://via.placeholder.com/40"
         alt="Logo Ecolimp" class="h-10 rounded-full" />
       <h1 class="text-xl font-bold">Ecolimp Dashboard</h1>
     </div>
@@ -93,9 +93,9 @@
       <div style="position:relative;">
         <div id="notifBell">
           <span style="font-size:1.5rem;">🔔</span>
-          <span id="notifCount" class="hidden">0</span>
+          <span class="hidden" id="notifCount">0</span>
         </div>
-        <div id="notifPanel" class="hidden p-3"></div>
+        <div class="hidden p-3" id="notifPanel"></div>
       </div>
       <button class="px-4 py-1 bg-red-600 rounded hover:bg-red-700" onclick="confirmLogout()">Cerrar sesión</button>
     </div>
@@ -109,7 +109,7 @@
       <button class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition" id="tabRoutes" onclick="goToTab('routes')">🗺️ Rutas</button>
     </div>
     <!-- Vista: Mensajes -->
-    <section id="viewMessages" class="hidden">
+    <section class="hidden" id="viewMessages">
       <div class="bg-white p-6 rounded shadow-md mb-4">
         <h2 class="text-2xl font-semibold mb-4 primary-text">📬 Mensajes de usuarios</h2>
         <div class="flex gap-2 mb-4">
@@ -117,25 +117,25 @@
           <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" onclick="openGlobalModal()">📢 Enviar aviso global</button>
         </div>
         <div class="mb-4 flex gap-2 items-center">
-          <input id="searchUser" type="text" placeholder="🔍 Buscar por usuario..." class="border px-3 py-2 rounded flex-1"/>
-          <select id="filterRead" class="border px-3 py-2 rounded">
+          <input class="border px-3 py-2 rounded flex-1" id="searchUser" placeholder="🔍 Buscar por usuario..." type="text"/>
+          <select class="border px-3 py-2 rounded" id="filterRead">
             <option value="all">Todos</option>
             <option value="unread">No leídos</option>
             <option value="read">Leídos</option>
           </select>
-          <select id="filterSender" class="border px-3 py-2 rounded">
+          <select class="border px-3 py-2 rounded" id="filterSender">
             <option value="all">Todos (enviados/recibidos)</option>
             <option value="received">Recibidos</option>
             <option value="sent">Enviados</option>
           </select>
         </div>
-        <div id="messagesList" class="space-y-3">
+        <div class="space-y-3" id="messagesList">
           <p class="text-gray-500">Cargando mensajes...</p>
         </div>
       </div>
     </section>
     <!-- Vista: Estadísticas -->
-    <section id="viewStats" class="hidden">
+    <section class="hidden" id="viewStats">
       <h2 class="text-2xl font-semibold mb-4 primary-text">📊 Estadísticas de la app</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-white p-6 rounded shadow-md">
@@ -153,74 +153,49 @@
       </div>
       <div class="bg-white p-6 rounded shadow-md mb-6">
         <h3 class="text-xl font-semibold mb-3">👥 Usuarios registrados</h3>
-        <input id="searchStatsUser" type="text" placeholder="🔍 Buscar por nombre o email..." class="border px-3 py-2 rounded w-full mb-3"/>
-        <div id="usersList" class="space-y-2 max-h-96 overflow-y-auto">
+        <input class="border px-3 py-2 rounded w-full mb-3" id="searchStatsUser" placeholder="🔍 Buscar por nombre o email..." type="text"/>
+        <div class="space-y-2 max-h-96 overflow-y-auto" id="usersList">
           <p class="text-gray-500">Cargando usuarios...</p>
         </div>
       </div>
       <div class="bg-white p-6 rounded shadow-md">
         <h3 class="text-xl font-semibold mb-3">📋 Reportes de contenedores</h3>
-        <div id="reportsList" class="space-y-2 max-h-96 overflow-y-auto">
+        <div class="space-y-2 max-h-96 overflow-y-auto" id="reportsList">
           <p class="text-gray-500">Cargando reportes...</p>
         </div>
       </div>
     </section>
     <!-- Vista: Rutas -->
-    <section id="viewRoutes" class="hidden">
+    <section class="hidden" id="viewRoutes">
       <h2 class="text-2xl font-semibold mb-4 primary-text">🗺️ Gestión de rutas y contenedores</h2>
       <p class="text-gray-600">Próximamente: mapa interactivo con contenedores y rutas óptimas.</p>
     </section>
   </main>
   <!-- === MODAL DE MENSAJE === -->
-  <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="messageModal">
     <div class="bg-white p-6 rounded shadow-md w-96">
       <h2 class="text-lg font-semibold mb-3">✉️ Enviar mensaje</h2>
-      <select id="modalRecipient" class="w-full border px-3 py-2 rounded mb-3">
+      <select class="w-full border px-3 py-2 rounded mb-3" id="modalRecipient">
         <option value="">-- Selecciona usuario --</option>
       </select>
-      <textarea id="modalContent" placeholder="Escribe tu mensaje..." rows="4" class="w-full border px-3 py-2 rounded mb-3"></textarea>
+      <textarea class="w-full border px-3 py-2 rounded mb-3" id="modalContent" placeholder="Escribe tu mensaje..." rows="4"></textarea>
       <div class="flex justify-end gap-2">
-        <button onclick="closeModal()" class="px-3 py-1 bg-gray-400 rounded text-white">Cancelar</button>
-        <button onclick="sendMessage()" class="px-3 py-1 bg-[#ff6600] rounded text-white">Enviar</button>
+        <button class="px-3 py-1 bg-gray-400 rounded text-white" onclick="closeModal()">Cancelar</button>
+        <button class="px-3 py-1 bg-[#ff6600] rounded text-white" onclick="sendMessage()">Enviar</button>
       </div>
     </div>
   </div>
-  <div id="globalMsgModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+  <div class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center" id="globalMsgModal">
     <div class="bg-white p-6 rounded shadow-md w-96">
       <h2 class="text-lg font-semibold mb-3">📢 Enviar aviso global</h2>
-      <textarea id="globalMsgContent" rows="4" placeholder="Escribe tu mensaje..."
-        class="w-full border px-3 py-2 rounded mb-3"></textarea>
+      <textarea class="w-full border px-3 py-2 rounded mb-3" id="globalMsgContent" placeholder="Escribe tu mensaje..." rows="4"></textarea>
       <div class="flex justify-end gap-2">
-        <button onclick="closeGlobalModal()" class="px-3 py-1 bg-gray-400 rounded text-white">Cancelar</button>
-        <button id="sendGlobalBtn" class="px-3 py-1 bg-[#ff6600] rounded text-white">Enviar</button>
+        <button class="px-3 py-1 bg-gray-400 rounded text-white" onclick="closeGlobalModal()">Cancelar</button>
+        <button class="px-3 py-1 bg-[#ff6600] rounded text-white" id="sendGlobalBtn">Enviar</button>
       </div>
     </div>
   </div>
   <!-- === SCRIPT PRINCIPAL === -->
   <script src="dashboard.js"></script>
-  <script>
-function openGlobalModal() {
-  document.getElementById("globalMsgModal").classList.remove("hidden");
-}
-function closeGlobalModal() {
-  document.getElementById("globalMsgModal").classList.add("hidden");
-  document.getElementById("globalMsgContent").value = "";
-}
-
-document.getElementById("sendGlobalBtn").addEventListener("click", async () => {
-  const msg = document.getElementById("globalMsgContent").value.trim();
-  if (!msg) return showToast("Mensaje vacío", "error");
-  const { data: users } = await client.from("users").select("id");
-  const inserts = users.map((u) => ({
-    user_id: u.id,
-    message: msg,
-    status: "pending",
-  }));
-  const { error } = await client.from("messages").insert(inserts);
-  if (error) return showToast("Error al enviar global", "error");
-  showToast("📢 Mensaje enviado a todos los usuarios", "success");
-  closeGlobalModal();
-});
-  </script>
 </body>
 </html>
