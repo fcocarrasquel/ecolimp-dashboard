@@ -4,287 +4,212 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ecolimp Dashboard</title>
-
   <!-- ✅ TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <!-- ✅ Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
   <!-- ✅ Toastify (notificaciones visuales) -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
- <!-- ✅ Estilos globales -->
-<style>
-  /* Tipografía y fondo general */
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
-  }
+  <!-- ✅ Estilos globales -->
+  <style>
+    /* Tipografía y fondo general */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* Colores institucionales */
-  .primary-bg { background-color: #ff6600; }
-  .primary-text { color: #ff6600; }
-  .dark-bg {
-    background-color: #111;
-    position: relative;      /* ✅ Necesario para z-index del header */
-    z-index: 40;
-  }
+    /* Colores institucionales */
+    .primary-bg { background-color: #ff6600; }
+    .primary-text { color: #ff6600; }
+    .dark-bg {
+      background-color: #111;
+      position: relative;      /* ✅ Necesario para z-index del header */
+      z-index: 40;
+    }
 
-  /* 🔔 Campana de notificación */
-  #notifBell {
-    position: relative;      /* ✅ Para que los elementos hijos se posicionen correctamente */
-    z-index: 60;             /* ✅ Asegura que esté sobre el fondo oscuro */
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    /* 🔔 Campana de notificación */
+    #notifBell {
+      position: relative;      /* ✅ Para que los elementos hijos se posicionen correctamente */
+      z-index: 60;             /* ✅ Asegura que esté sobre el fondo oscuro */
+      transition: transform 0.2s ease-in-out;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #notifBell:hover {
+      transform: scale(1.15);
+    }
 
-  #notifBell:hover {
-    transform: scale(1.15);
-  }
+    /* 🔴 Contador */
+    #notifCount {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      min-width: 18px;
+      text-align: center;
+      background: #e11d48;
+      color: #fff;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 4px;
+      box-shadow: 0 0 0 2px #111;
+    }
 
-  /* 🔴 Contador */
-  #notifCount {
-    position: absolute;
-    top: -4px;
-    right: -6px;
-    min-width: 18px;
-    text-align: center;
-    background: #e11d48;
-    color: #fff;
-    border-radius: 9999px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 2px 5px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.4);
-    animation: bounce 1s infinite alternate;
-    z-index: 70;             /* ✅ Siempre encima del SVG */
-  }
-
-  /* 🩷 Animación rebote */
-  @keyframes bounce {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-2px); }
-    100% { transform: translateY(0); }
-  }
-
-  /* 💬 Tooltip */
-  .tooltip {
-    position: absolute;
-    background: #000;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 80;             /* ✅ Sobre todo lo demás */
-    top: 28px;
-    white-space: nowrap;
-  }
-
-  .group:hover .tooltip {
-    opacity: 1;
-  }
-
-  /* ✨ SVG glow sutil sobre fondo oscuro */
-  #notifBell svg {
-    filter: drop-shadow(0 0 2px orange);
-  }
-  /* 🔴 Badge de notificación junto a la pestaña */
-#notifBadge {
-  animation: pulse 1.5s infinite;
-  transition: all 0.3s ease;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.85; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-</style>
-
+    /* Panel desplegable de notificaciones */
+    #notifPanel {
+      position: absolute;
+      z-index: 70;
+      right: 0;
+      top: 50px;
+      width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    }
+    #notifPanel::-webkit-scrollbar {
+      width: 6px;
+    }
+    #notifPanel::-webkit-scrollbar-thumb {
+      background: #ff6600;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-
-
-<body class="text-gray-900">
-  <!-- HEADER -->
-  <header class="dark-bg text-white px-6 py-3 flex justify-between items-center shadow-md relative z-50">
-  <!-- LOGO -->
-  <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-    🧼 Ecolimp Dashboard
-  </h1>
-
-  <!-- SECCIÓN DERECHA -->
-  <div class="flex items-center gap-6 relative z-50">
-    <!-- 🔔 Notificaciones -->
-    <div id="notifBell"
-         class="relative flex items-center justify-center cursor-pointer group"
-         title="Mensajes nuevos"
-         style="display:none; z-index:60;">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           fill="none"
-           viewBox="0 0 24 24"
-           stroke-width="2"
-           stroke="orange"
-           class="w-7 h-7 animate-pulse drop-shadow-lg">
-        <path stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.937M13 21a2 2 0 01-4 0" />
-      </svg>
-      <span id="notifCount"
-            class="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg z-[70]">
-      </span>
-
-      <!-- Tooltip -->
-      <div class="absolute opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs px-2 py-1 rounded-md mt-8 z-[80] whitespace-nowrap">
-        Tienes mensajes nuevos
+<body>
+  <!-- === HEADER === -->
+  <header class="dark-bg text-white py-4 px-6 flex justify-between items-center shadow-md">
+    <div class="flex items-center gap-3">
+      <img src="https://scontent.fccs3-1.fna.fbcdn.net/v/t39.30808-6/294846936_105825492270263_5024253835597845073_n.png?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=WUELsw3pMPQQ7kNvgGcRzHV&_nc_zt=23&_nc_ht=scontent.fccs3-1.fna&_nc_gid=AmWwvPGx5kkJglr8n1u7nKR&oh=00_AYDHbFHl-n1NX-_G1I1nXCcz3Z1NZuqDRsjqvB3qwDQNlA&oe=671CF8E7"
+        alt="Logo Ecolimp" class="h-10 rounded-full" />
+      <h1 class="text-xl font-bold">Ecolimp Dashboard</h1>
+    </div>
+    <div class="flex items-center gap-6">
+      <span id="userEmail" class="text-sm">Cargando...</span>
+      <div style="position:relative;">
+        <div id="notifBell">
+          <span style="font-size:1.5rem;">🔔</span>
+          <span id="notifCount" class="hidden">0</span>
+        </div>
+        <div id="notifPanel" class="hidden p-3"></div>
       </div>
+      <button onclick="confirmLogout()" class="px-4 py-1 bg-red-600 rounded hover:bg-red-700">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <!-- === CONTENEDOR PRINCIPAL === -->
+  <main class="px-6 py-8">
+    <!-- Pestañas -->
+    <div class="flex gap-2 mb-6">
+      <button onclick="goToTab('messages')" id="tabMessages" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">💬 Mensajes</button>
+      <button onclick="goToTab('stats')" id="tabStats" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">📊 Estadísticas</button>
+      <button onclick="goToTab('routes')" id="tabRoutes" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition">🗺️ Rutas</button>
     </div>
 
-    <!-- 🔓 Botón logout -->
-    <button id="logoutBtn"
-            class="hidden bg-[#ff6600] px-4 py-2 rounded hover:bg-orange-600 transition font-medium z-[50]">
-      Cerrar sesión
-    </button>
-  </div>
-</header>
-  <!-- MAIN -->
-  <main class="p-6">
-    <!-- === LOGIN === -->
-    <section id="loginSection" class="max-w-sm mx-auto bg-white p-6 rounded-lg shadow-lg">
-      <h2 class="text-lg font-semibold mb-3 text-center primary-text">Ingreso administrador o cliente</h2>
-      <input id="email" type="email" placeholder="Correo" class="w-full border p-2 mb-2 rounded" />
-      <input id="password" type="password" placeholder="Contraseña" class="w-full border p-2 mb-4 rounded" />
-      <button id="loginBtn" class="w-full py-2 rounded text-white primary-bg hover:bg-orange-600 transition">
-        Entrar
-      </button>
+    <!-- Vista: Mensajes -->
+    <section id="viewMessages" class="hidden">
+      <div class="bg-white p-6 rounded shadow-md mb-4">
+        <h2 class="text-2xl font-semibold mb-4 primary-text">📬 Mensajes de usuarios</h2>
+        <div class="flex gap-2 mb-4">
+          <button onclick="openModal()" class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600 transition">📨 Enviar mensaje individual</button>
+          <button onclick="openGlobalModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">📢 Enviar aviso global</button>
+        </div>
+        <div class="mb-4 flex gap-2 items-center">
+          <input id="searchUser" type="text" placeholder="🔍 Buscar por usuario..." class="border px-3 py-2 rounded flex-1" />
+          <select id="filterRead" class="border px-3 py-2 rounded">
+            <option value="all">Todos</option>
+            <option value="unread">No leídos</option>
+            <option value="read">Leídos</option>
+          </select>
+          <select id="filterSender" class="border px-3 py-2 rounded">
+            <option value="all">Todos (enviados/recibidos)</option>
+            <option value="received">Recibidos</option>
+            <option value="sent">Enviados</option>
+          </select>
+        </div>
+        <div id="messagesList" class="space-y-3">
+          <p class="text-gray-500">Cargando mensajes...</p>
+        </div>
+      </div>
     </section>
-    <div id="registerSection" class="hidden p-4 text-center">
-  <h2 class="text-xl font-semibold mb-2">Crear cuenta nueva</h2>
-  <input id="regName" type="text" placeholder="Nombre completo" class="border rounded px-3 py-2 mb-2 w-64"><br>
-  <input id="regEmail" type="email" placeholder="Correo electrónico" class="border rounded px-3 py-2 mb-2 w-64"><br>
-  <input id="regPass" type="password" placeholder="Contraseña" class="border rounded px-3 py-2 mb-3 w-64"><br>
-  <button id="registerBtn" class="bg-[#ff6600] text-white px-4 py-2 rounded hover:bg-orange-600">
-    Crear cuenta
-  </button>
-</div>
 
-<p class="text-sm text-gray-600 mt-2">
-  ¿No tienes cuenta? <span id="goRegister" class="text-[#ff6600] cursor-pointer hover:underline">Regístrate</span>
-</p>
-
-    <!-- === DASHBOARD === -->
-    <section id="dashboardSection" class="hidden">
-      <!-- NAV -->
-      <nav class="flex gap-6 border-b border-gray-200 px-6 pt-3 text-gray-700 font-medium">
-  <button id="tabUsers" class="pb-2 border-b-2 border-orange-500 text-orange-600 focus:outline-none">
-    Usuarios
-  </button>
-
-  <button id="tabMessages" class="pb-2 hover:text-orange-600 relative focus:outline-none">
-    Mensajes
-    <span id="notifBadge" 
-          class="absolute -top-2 -right-5 hidden bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md">
-    </span>
-  </button>
-</nav>
-
-      <!-- === USUARIOS === -->
-      <div id="usersView">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-[#111]">Panel de Referidos</h2>
-          <button id="refreshBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600 transition">
-            Actualizar
-          </button>
+    <!-- Vista: Estadísticas -->
+    <section id="viewStats" class="hidden">
+      <h2 class="text-2xl font-semibold mb-4 primary-text">📊 Estadísticas de la app</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-6 rounded shadow-md">
+          <p class="text-gray-600 text-sm">Total de usuarios</p>
+          <p id="statUsers" class="text-3xl font-bold primary-text">0</p>
         </div>
-
-        <!-- STATS -->
-        <div id="stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-            <h3 class="text-gray-500 text-sm">Usuarios activos</h3>
-            <p id="totalUsers" class="text-2xl font-bold text-[#111]">0</p>
-          </div>
-          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-            <h3 class="text-gray-500 text-sm">Saldo total</h3>
-            <p id="totalBalance" class="text-2xl font-bold text-[#111]">$0</p>
-          </div>
-          <div class="bg-white p-4 rounded-lg shadow text-center border-t-4 border-[#ff6600]">
-            <h3 class="text-gray-500 text-sm">Referidos activos</h3>
-            <p id="totalReferrals" class="text-2xl font-bold text-[#111]">0</p>
-          </div>
+        <div class="bg-white p-6 rounded shadow-md">
+          <p class="text-gray-600 text-sm">Puntos canjeados (total)</p>
+          <p id="statPoints" class="text-3xl font-bold primary-text">0</p>
         </div>
-
-        <!-- TABLA DE USUARIOS -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full bg-white rounded shadow-lg">
-            <thead class="dark-bg text-white">
-              <tr>
-                <th class="py-2 px-3 text-left">Cliente</th>
-                <th class="py-2 px-3">Referidos</th>
-                <th class="py-2 px-3">Saldo</th>
-                <th class="py-2 px-3">Ciclo</th>
-                <th class="py-2 px-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="usersTable" class="text-center"></tbody>
-          </table>
+        <div class="bg-white p-6 rounded shadow-md">
+          <p class="text-gray-600 text-sm">Reportes realizados</p>
+          <p id="statReports" class="text-3xl font-bold primary-text">0</p>
         </div>
       </div>
 
-      <!-- === MENSAJES === -->
-      <div id="messagesView" class="hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-[#111]">Mensajes Enviados</h2>
-          <button id="refreshMsgsBtn" class="primary-bg text-white px-4 py-2 rounded hover:bg-orange-600 transition">
-            Actualizar
-          </button>
-        </div>
-
-        <!-- TABLA DE MENSAJES -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full bg-white rounded shadow-lg">
-            <thead class="dark-bg text-white">
-              <tr>
-                <th class="py-2 px-3 text-left">Cliente</th>
-                <th class="py-2 px-3 text-left">Mensaje</th>
-                <th class="py-2 px-3">Fecha</th>
-                <th class="py-2 px-3">Estado</th>
-              </tr>
-            </thead>
-            <tbody id="messagesTable" class="text-center"></tbody>
-          </table>
+      <div class="bg-white p-6 rounded shadow-md mb-6">
+        <h3 class="text-xl font-semibold mb-3">👥 Usuarios registrados</h3>
+        <input id="searchStatsUser" type="text" placeholder="🔍 Buscar por nombre o email..." class="border px-3 py-2 rounded w-full mb-3" />
+        <div id="usersList" class="space-y-2 max-h-96 overflow-y-auto">
+          <p class="text-gray-500">Cargando usuarios...</p>
         </div>
       </div>
+
+      <div class="bg-white p-6 rounded shadow-md">
+        <h3 class="text-xl font-semibold mb-3">📋 Reportes de contenedores</h3>
+        <div id="reportsList" class="space-y-2 max-h-96 overflow-y-auto">
+          <p class="text-gray-500">Cargando reportes...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vista: Rutas -->
+    <section id="viewRoutes" class="hidden">
+      <h2 class="text-2xl font-semibold mb-4 primary-text">🗺️ Gestión de rutas y contenedores</h2>
+      <p class="text-gray-600">Próximamente: mapa interactivo con contenedores y rutas óptimas.</p>
     </section>
   </main>
 
   <!-- === MODAL DE MENSAJE === -->
-  <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h3 class="text-lg font-semibold mb-2">
-        Enviar mensaje a <span id="modalUserName" class="primary-text"></span>
-      </h3>
-      <textarea id="messageContent" class="w-full border rounded p-2 mb-3" rows="4" placeholder="Escribe el mensaje..."></textarea>
+  <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="messageModal">
+    <div class="bg-white p-6 rounded shadow-md w-96">
+      <h2 class="text-lg font-semibold mb-3">✉️ Enviar mensaje</h2>
+      <select id="modalRecipient" class="w-full border px-3 py-2 rounded mb-3">
+        <option value="">-- Selecciona usuario --</option>
+      </select>
+      <textarea id="modalContent" placeholder="Escribe tu mensaje..." rows="4" class="w-full border px-3 py-2 rounded mb-3"></textarea>
       <div class="flex justify-end gap-2">
-        <button onclick="closeMessageModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
-          Cancelar
-        </button>
-        <button id="sendMsgBtn" class="px-4 py-2 bg-[#ff6600] text-white rounded hover:bg-orange-600 transition">
-          Enviar
-        </button>
+        <button onclick="closeModal()" class="px-3 py-1 bg-gray-400 rounded text-white">Cancelar</button>
+        <button onclick="sendMessage()" class="px-3 py-1 bg-[#ff6600] rounded text-white">Enviar</button>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL -->
+  <div id="globalMsgModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-md w-96">
+      <h2 class="text-lg font-semibold mb-3">📢 Enviar aviso global</h2>
+      <textarea id="globalMsgContent" rows="4" placeholder="Escribe tu mensaje..."
+        class="w-full border px-3 py-2 rounded mb-3"></textarea>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeGlobalModal()" class="px-3 py-1 bg-gray-400 rounded text-white">Cancelar</button>
+        <button id="sendGlobalBtn" class="px-3 py-1 bg-[#ff6600] rounded text-white">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === SCRIPT PRINCIPAL === -->
   <script src="dashboard.js"></script>
 </body>
 </html>
